@@ -31,7 +31,12 @@ namespace testGPBA.Controllers
             var createdOffer = await _repository.CreateOfferAsync(offer);
             return CreatedAtAction(nameof(Offer), new { id = createdOffer.Id }, createdOffer);
         }
-
+        [HttpGet]
+        public async Task<ActionResult> GetAllOffers()
+        {
+            (IEnumerable<Offer> offers, int totalCounts) = await _repository.GetAllOffersAsync();
+            return Ok(new OfferSearchResult(offers, totalCounts));
+        }
         [HttpGet("search")]
         public async Task<ActionResult> SearchOffers([FromQuery] string query = "")
         {            

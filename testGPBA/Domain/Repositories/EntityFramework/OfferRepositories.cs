@@ -54,5 +54,17 @@ namespace testGPBA.Domain.Repositories.EntityFramework
                 .ToListAsync();
                 
         }
+
+        public async Task<(IEnumerable<Offer>, int)> GetAllOffersAsync()
+        {
+            var query = _context.Offers
+                .Include(o => o.Supplier)
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var offers = await query.ToListAsync();
+
+            return (offers, totalCount);
+        }
     }
 }
