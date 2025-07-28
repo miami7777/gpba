@@ -1,12 +1,16 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Infrastructure.Domain;
-using Infrastructure.Domain.Repositories.Abstract;
-using Infrastructure.Domain.Repositories.EntityFramework;
-using Infrastructure.Models;
-
+using Infrastructure.Repositories.Abstract;
+using Infrastructure.Repositories.EntityFramework;
+using PublicApi.Models;
+using PublicApi.Services;
+using ApplicationCore.Interfaces;
+using PublicApi;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 public class Startup {
     public Startup(IConfiguration configuration)
     {
@@ -18,7 +22,7 @@ public class Startup {
     public BaseConfiguration BaseConfiguration { get; }
     public void ConfigureServices(IServiceCollection services)
     {
-
+        services.AddTransient<IOffersService, OffersService>();
         services.AddDbContext<AppDbContext>(x => x.UseSqlServer(BaseConfiguration.projectConnection));
         services.AddCors(options =>
         {
@@ -36,14 +40,15 @@ public class Startup {
             configuration.RootPath = "ClientApp/build";
         });
         services.AddScoped<IOfferRepositories, OfferRepositories>();
-
+        services.AddAutoMapper(typeof(MappingProfile));
         services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddEndpointsApiExplorer();        
+        services.AddSwaggerGen();        
     }
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
